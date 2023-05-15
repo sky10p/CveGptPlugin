@@ -9,7 +9,7 @@ paths:
   /api/cve/{cveId}:
     get:
       operationId: getCve
-      summary: Returns comprehensive data in JSON format for a specific Common Vulnerability and Exposure (CVE). This includes key details like CVSS score, related CPEs, CWEs, and additional information like RedHat Advisories
+      summary: Get CVE data
       parameters:
       - in: path
         name: cveId
@@ -40,12 +40,30 @@ components:
     getCveResponse:
       type: object
       properties:
+        summary:
+          type: string
+          description: The description or summary of the CVE.
         Modified:
           type: string
           description: The date when the CVE was modified.
         Published:
           type: string
           description: The date when the CVE was published.
+        cvss:
+          type: number
+          description: The CVSS score of the CVE.
+        cvss-time:
+          type: string
+          description: The time when the CVSS score was provided.
+        cvss-vector:
+          type: string
+          description: The CVSS vector string.
+        cwe:
+          type: string
+          description: The CWE ID related to the CVE.
+        id:
+          type: string
+          description: The ID of the CVE.
         access:
           type: object
           description: Access information related to the CVE.
@@ -88,21 +106,6 @@ components:
               summary:
                 type: string
                 description: Summary of the CAPEC entry.
-        cvss:
-          type: number
-          description: The CVSS score of the CVE.
-        cvss-time:
-          type: string
-          description: The time when the CVSS score was provided.
-        cvss-vector:
-          type: string
-          description: The CVSS vector string.
-        cwe:
-          type: string
-          description: The CWE ID related to the CVE.
-        id:
-          type: string
-          description: The ID of the CVE.
         impact:
           type: object
           description: Impact information of the           CVE.
@@ -168,9 +171,6 @@ components:
               items:
                 type: string
               description: SecurityTracker references related to the CVE.
-        summary:
-          type: string
-          description: The description or summary of the CVE.
         vulnerable_configuration:
           type: array
           description: The vulnerable configurations for the CVE.
