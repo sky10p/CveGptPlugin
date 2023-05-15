@@ -1,93 +1,231 @@
 openapi: 3.0.1
 info:
-  title: TODO Plugin
-  description: A plugin that allows the user to create and manage a TODO list using ChatGPT. If you do not know the user's username, ask them first before making queries to the plugin. Otherwise, use the username "global".
+  title: CVE Descriptor Plugin
+  description: A plugin that describes CVEs. It allows to return information of a CVE, vulnerabilities of a CPE, the latest found vulnerabilities, list all CWEs, and return a CWE by its ID.
   version: 'v1'
 servers:
   - url: http://localhost:5003
 paths:
-  /todos/{username}:
+  /api/cve/{cveId}:
     get:
-      operationId: getTodos
-      summary: Get the list of todos
+      operationId: getCve
+      summary: Returns comprehensive data in JSON format for a specific Common Vulnerability and Exposure (CVE). This includes key details like CVSS score, related CPEs, CWEs, and additional information like RedHat Advisories
       parameters:
       - in: path
-        name: username
+        name: cveId
         schema:
             type: string
         required: true
-        description: The name of the user.
+        description: The id of the CVE (Example CVE-2016-3333)
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getTodosResponse'
-    post:
-      operationId: addTodo
-      summary: Add a todo to the list
-      parameters:
-      - in: path
-        name: username
-        schema:
-            type: string
-        required: true
-        description: The name of the user.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/addTodoRequest'
+                $ref: '#/components/schemas/getCveResponse'
+  /api/cwe:
+    get:
+      operationId: getCweList
+      summary: List all CWEs
       responses:
         "200":
           description: OK
-    delete:
-      operationId: deleteTodo
-      summary: Delete a todo from the list
-      parameters:
-      - in: path
-        name: username
-        schema:
-            type: string
-        required: true
-        description: The name of the user.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/deleteTodoRequest'
-      responses:
-        "200":
-          description: OK
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getCweListResponse'
 components:
   schemas:
-    getTodosResponse:
+    getCveResponse:
       type: object
       properties:
-        todos:
+        Modified:
+          type: string
+          description: The date when the CVE was modified.
+        Published:
+          type: string
+          description: The date when the CVE was published.
+        access:
+          type: object
+          description: Access information related to the CVE.
+          properties:
+            authentication:
+              type: string
+              description: Authentication information for the CVE.
+            complexity:
+              type: string
+              description: Complexity of the CVE.
+            vector:
+              type: string
+              description: Vector of the CVE.
+        assigner:
+          type: string
+          description: The assigner of the CVE.
+        capec:
+          type: array
+          description: CAPEC entries related to the CVE.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The ID of the CAPEC entry.
+              name:
+                type: string
+                description: The name of the CAPEC entry.
+              prerequisites:
+                type: string
+                description: Prerequisites for the CAPEC entry.
+              related_weakness:
+                type: array
+                items:
+                  type: string
+                description: Related weaknesses to the CAPEC entry.
+              solutions:
+                type: string
+                description: Solutions for the CAPEC entry.
+              summary:
+                type: string
+                description: Summary of the CAPEC entry.
+        cvss:
+          type: number
+          description: The CVSS score of the CVE.
+        cvss-time:
+          type: string
+          description: The time when the CVSS score was provided.
+        cvss-vector:
+          type: string
+          description: The CVSS vector string.
+        cwe:
+          type: string
+          description: The CWE ID related to the CVE.
+        id:
+          type: string
+          description: The ID of the CVE.
+        impact:
+          type: object
+          description: Impact information of the           CVE.
+          properties:
+            availability:
+              type: string
+              description: The availability impact of the CVE.
+            confidentiality:
+              type: string
+              description: The confidentiality impact of the CVE.
+            integrity:
+              type: string
+              description: The integrity impact of the CVE.
+        last-modified:
+          type: string
+          description: The last modification date of the CVE.
+        msbulletin:
+          type: array
+          description: Microsoft bulletins related to the CVE.
+          items:
+            type: object
+            properties:
+              bulletin_id:
+                type: string
+                description: The ID of the Microsoft bulletin.
+              bulletin_url:
+                type: string
+                description: The URL of the Microsoft bulletin.
+              date:
+                type: string
+                description: The date of the Microsoft bulletin.
+              impact:
+                type: string
+                description: The impact of the Microsoft bulletin.
+              knowledgebase_id:
+                type: string
+                description: The ID of the knowledge base related to the Microsoft bulletin.
+              knowledgebase_url:
+                type: string
+                description: The URL of the knowledge base related to the Microsoft bulletin.
+              severity:
+                type: string
+                description: The severity of the Microsoft bulletin.
+              title:
+                type: string
+                description: The title of the Microsoft bulletin.
+        references:
           type: array
           items:
             type: string
-          description: The list of todos.
-    addTodoRequest:
-      type: object
-      required:
-      - todo
-      properties:
-        todo:
+          description: References related to the CVE.
+        refmap:
+          type: object
+          description: Reference map
+          properties:
+            bid:
+              type: array
+              items:
+                type: string
+              description: BID references related to the CVE.
+            sectrack:
+              type: array
+              items:
+                type: string
+              description: SecurityTracker references related to the CVE.
+        summary:
           type: string
-          description: The todo to add to the list.
-          required: true
-    deleteTodoRequest:
-      type: object
-      required:
-      - todo_idx
-      properties:
-        todo_idx:
-          type: integer
-          description: The index of the todo to delete.
-          required: true
+          description: The description or summary of the CVE.
+        vulnerable_configuration:
+          type: array
+          description: The vulnerable configurations for the CVE.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The ID of the vulnerable configuration.
+              title:
+                type: string
+                description: The title of the vulnerable configuration.
+        vulnerable_configuration_cpe_2_2:
+          type: array
+          items:
+            type: string
+          description: CPE 2.2 vulnerable configurations.
+        vulnerable_product:
+          type: array
+          items:
+            type: string
+          description: Products vulnerable to the CVE.
+    getCweListResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          Description:
+            type: string
+            description: The description of the CWE.
+          id:
+            type: string
+            description: The ID of the CWE.
+          name:
+            type: string
+            description: The name of the CWE.
+          status:
+            type: string
+            description: The status of the CWE (Draft, Deprecated, etc).
+          weaknessabs:
+            type: string
+            description: The abstractness level of the CWE (Category, Class, etc).
+          relationships:
+            type: array
+            description: An array of relationships to other CWEs (only appears in some CWEs).
+            items:
+              type: object
+              properties:
+                nature:
+                  type: string
+                  description: The nature of the relationship.
+                cwe_id:
+                  type: string
+                  description: The ID of the CWE in relation to this one.
+                cwe_name:
+                  type: string
+                  description: The name of the CWE in relation to this one.
+
